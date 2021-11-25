@@ -12,15 +12,6 @@ import {
   REACT_APP_MEASUREMENT_ID
 } from "@env";
 
-// const firebaseConfig = {
-//   apiKey: "AIzaSyDyUkwcFo_uCiCXRls8pDB4OkvwDFnREBI",
-//   authDomain: "react-native-instagram-c-bf860.firebaseapp.com",
-//   projectId: "react-native-instagram-c-bf860",
-//   storageBucket: "react-native-instagram-c-bf860.appspot.com",
-//   messagingSenderId: "907589492589",
-//   appId: "1:907589492589:web:9be1fedb9e4f9c1f244464",
-//   measurementId: "G-5SRVBKKM8N",
-// };
 
 const firebaseConfig = {
   apiKey: REACT_APP_API_KEY,
