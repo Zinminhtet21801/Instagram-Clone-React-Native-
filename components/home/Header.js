@@ -1,10 +1,22 @@
 import React from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from "react-native";
+import { app } from "../../firebaseConfig"; 
+import { getAuth, signOut } from "firebase/auth";
+
+const auth = getAuth()
+
+const handleSignOut = () =>{
+  try{
+    signOut(auth).then(()=> Alert.alert("Sign Out", "Sign Out Completed"))
+  }catch(error){
+    Alert.alert("Sign Out Error", error.message)
+  }
+}
 
 const Header = ({navigation}) => {
   return (
     <View style={styles.container}>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={handleSignOut}>
         <Image
           style={styles.logo}
           source={require("../../assets/instagram.png")}

@@ -8,23 +8,59 @@ import {
   Pressable,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import Validator from "email-validator";
+import { db, app } from "../../firebaseConfig";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, collection, addDoc, serverTimestamp, setDoc, doc } from "firebase/firestore";
+
+const auth = getAuth();
+
+const getRandomProfilePicture = async () => {
+  const response = await fetch("https://randomuser.me/api");
+  const data = await response.json();
+  return data.results[0].picture.large;
+};
+
+const onSignUp = async (username = "", email, password) => {
+  try {
+    const authUser = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    await setDoc(doc(db,"users", authUser.user.email),{
+      owner_id: authUser.user.uid,
+      username: username,
+      email: authUser.user.email,
+      profile_picture : await getRandomProfilePicture(),
+      timestamp : serverTimestamp()
+    }).then(msg=> Alert.alert("Success", "Sign Up Process Successed"))
+  } catch (error) {
+    Alert.alert("Bitch", error.message);
+  }
+};
 
 const validationScheme = Yup.object().shape({
   email: Yup.string().email().required("Email is required."),
-  username: Yup.string().required().min(2, "At least two letters is required for username."),
+  username: Yup.string()
+    .required()
+    .min(2, "At least two letters is required for username."),
   password: Yup.string()
     .required()
     .min(6, "Your password needs to be at least 6 characters."),
 });
-const SignUpForm = () => {
+
+const SignUpForm = ({ navigation }) => {
   return (
     <Formik
-      initialValues={{ email: "", password: "", username : "" }}
-      onSubmit={(values) => console.log(values)}
+      initialValues={{ email: "", password: "", username: "" }}
+      onSubmit={(values) =>
+        onSignUp(values.username, values.email, values.password)
+      }
       validationSchema={validationScheme}
       validateOnMount={true}
     >
@@ -36,18 +72,15 @@ const SignUpForm = () => {
         isValid,
         errors,
         touched,
-        setFieldTouched
+        setFieldTouched,
       }) => (
         <View style={styles.wrapper}>
-        <View style={{ marginBottom: 8 }}>
+          <View style={{ marginBottom: 8 }}>
             <View
               style={[
                 styles.inputField,
                 {
-                  borderColor:
-                    values.username.trim().length > 1
-                      ? "#ccc"
-                      : "red",
+                  borderColor: values.username.trim().length ? "#ccc" : "red",
                 },
               ]}
             >
@@ -143,7 +176,7 @@ const SignUpForm = () => {
 
           <View style={styles.signUpContainer}>
             <Text>Already have an account?</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
               <Text style={{ color: "#6bb0f5" }}> Login</Text>
             </TouchableOpacity>
           </View>
@@ -154,35 +187,35 @@ const SignUpForm = () => {
 };
 
 const styles = StyleSheet.create({
-    wrapper: {
-      marginTop: 80,
-    },
-    inputField: {
-      borderRadius: 4,
-      padding: 12,
-      backgroundColor: "#FAFAFA",
-      marginBottom: 10,
-      borderWidth: 1,
-      borderColor: "gray",
-    },
-    button: (isValid) => ({
-      backgroundColor: isValid ? "#0096F6" : "#9Acaf7",
-      alignItems: "center",
-      justifyContent: "center",
-      minHeight: 42,
-      borderRadius: 4,
-    }),
-    buttonText: {
-      fontWeight: "600",
-      color: "#fff",
-      fontSize: 20,
-    },
-    signUpContainer: {
-      flexDirection: "row",
-      width: "100%",
-      justifyContent: "center",
-      marginTop: 50,
-    },
-  });
+  wrapper: {
+    marginTop: 80,
+  },
+  inputField: {
+    borderRadius: 4,
+    padding: 12,
+    backgroundColor: "#FAFAFA",
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "gray",
+  },
+  button: (isValid) => ({
+    backgroundColor: isValid ? "#0096F6" : "#9Acaf7",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 42,
+    borderRadius: 4,
+  }),
+  buttonText: {
+    fontWeight: "600",
+    color: "#fff",
+    fontSize: 20,
+  },
+  signUpContainer: {
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "center",
+    marginTop: 50,
+  },
+});
 
 export default SignUpForm;

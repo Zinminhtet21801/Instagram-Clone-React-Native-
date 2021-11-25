@@ -6,7 +6,7 @@ import SignUpForm from "../components/SignUpScreen/SignUpForm";
 const INSTAGRAM_LOGO =
   "https://www.freepnglogos.com/uploads/instagram-logo-png-hd-31.png";
 
-const SignUpScreen = () => {
+const SignUpScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
@@ -15,7 +15,7 @@ const SignUpScreen = () => {
           style={{ width: 100, height: 100 }}
         />
       </View>
-      <SignUpForm />
+      <SignUpForm navigation={navigation} />
     </View>
   );
 };
